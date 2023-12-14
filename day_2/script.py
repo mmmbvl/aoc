@@ -29,3 +29,29 @@ for game in inp:
         total += game_number
 
 print("Total is: ", total)
+
+
+
+total = 0
+for game in inp:
+    print("Looking at Game: ", game)
+    rounds = game.split(":")[1]
+
+    colors_req = {}
+
+    for round in rounds.split(";"):
+        colors = round.split(", ")
+        for color in colors:
+            number_found = int("".join(filter(lambda n: n.isdigit(), list(color))))
+            color_found = "".join(filter(lambda n: n.isalpha(), list(color)))
+            if not (color_found in colors_req.keys()) or (number_found > colors_req[color_found]):
+                colors_req[color_found] = number_found
+    
+    print("Cubes required for this game are: ", colors_req)
+    power = 1
+    for c in colors_req:
+        power *= colors_req[c]
+    total += power
+
+
+print("Total is: ", total)
