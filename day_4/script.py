@@ -2,8 +2,13 @@ inp = open('input').readlines()
 
 total = 0
 
+card_wins = []
+propatagate = []
+
 for card in inp:
     print(card)
+
+    number_of_matches = 0
 
     cardx = card.split(":")
     numbers = cardx[1]
@@ -26,6 +31,7 @@ for card in inp:
     for a in my_numbers:
         for b in winning_numbers:
             if (a == b):
+                number_of_matches += 1
                 print("Found a winning number: ", a)
                 if (points == 0):
                     points = 1
@@ -35,4 +41,26 @@ for card in inp:
     print("Value of this card is: ", points, "\n---\n")
     total += points
 
+    card_wins.append(number_of_matches)
+    propatagate.append(1)
+
 print(total)
+
+
+print(list(card_wins))
+print(list(propatagate))
+
+for idx, multipler in enumerate(card_wins):
+    for ix in range(multipler):
+        if (idx + ix + 1) < len(card_wins):
+            propatagate[idx + ix + 1] += propatagate[idx]
+            print(list(card_wins[0:40]))
+            print(list(propatagate[0:40]))
+
+
+card_total = 0
+
+for x in propatagate:
+    card_total += x
+
+print(card_total,"   ---")
