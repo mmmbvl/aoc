@@ -18,21 +18,17 @@ ary = []
 for line in inp:
     ary.append(list(line))
 
-
-
 total = 0
 for rx, r in enumerate(ary):
     numixstart = -1
     numixend = -1
     for cx, c in enumerate(r):
-        # find numbers:
         if (c.isdigit() and cx > numixend):
             p = cx
             numixstart = p
             while (p < len(r)) and r[p].isdigit():
                 p += 1
             numixend = p
-            # determine search space
             if determineValidity(rx, numixstart, numixend):
                 number_found = int("".join(r[numixstart:numixend]))
                 total += number_found
