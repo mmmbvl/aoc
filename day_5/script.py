@@ -15,14 +15,36 @@ seeds = []
 seedschanged = []
 current_v = "seed"
 
-
 print("Initializing...")
 seeds = list(map(lambda x: int(x), inp[0].split(" ")[1:]))
-seedschanged = inp[0].split(" ")[1:]
+seedschanged = seeds[:]
 for yyy, zzz in enumerate(seedschanged):
     seedschanged[yyy] = False
 print("seeds: ", list(seeds))
 print("change status: ", list(seedschanged), "\n\n---\n\n")
+
+
+
+#seed ranges
+seedslist = list(map(lambda x: int(x), inp[0].split(" ")[1:]))
+stpt = -1
+rngpt = -1
+for item in seedslist:
+    if (stpt == -1):
+        stpt = item
+        continue
+    rngpt = item
+    seeds += list(range(stpt, stpt + rngpt))
+    stpt = -1
+    rngpt = -1
+
+for uy, uc in enumerate(seeds):
+    if (uy % 921119 != 0):
+        seeds[uy:uy+1] = []
+
+seedschanged = seeds[:]
+for yyy, zzz in enumerate(seedschanged):
+    seedschanged[yyy] = False
 
 
 for line in inp:
