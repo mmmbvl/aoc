@@ -6,8 +6,6 @@ card_wins = []
 propatagate = []
 
 for card in inp:
-    print(card)
-
     number_of_matches = 0
 
     cardx = card.split(":")
@@ -23,32 +21,22 @@ for card in inp:
     winning_numbers = list(map(lambda x: int(x), winning_numbers))
     my_numbers = list(map(lambda y: int(y), my_numbers))
 
-    print("winning: ", list(winning_numbers))
-    print("my_numbers: ", list(my_numbers))
-
     points = 0
 
     for a in my_numbers:
         for b in winning_numbers:
             if (a == b):
                 number_of_matches += 1
-                print("Found a winning number: ", a)
                 if (points == 0):
                     points = 1
                 else:
                     points *= 2
-    
-    print("Value of this card is: ", points, "\n---\n")
     total += points
 
     card_wins.append(number_of_matches)
     propatagate.append(1)
 
 print(total)
-
-
-print(list(card_wins))
-print(list(propatagate))
 
 for idx, multipler in enumerate(card_wins):
     for ix in range(multipler):
