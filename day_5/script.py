@@ -58,6 +58,7 @@ for line in inp:
     #     print("change status: ", list(seedschanged), "\n\n---\n\n")
     #     c += 1
     #     continue
+    
     if (c == 0):
         c += 1
         continue
