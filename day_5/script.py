@@ -53,16 +53,24 @@ for line in inp:
     maps[currMap].append([destn, sourc, rng_l])
 
 for convTarget in items:
-    for seedRange in seeds:
+    # print("convTarget is: ", convTarget)
+    newSds = []
+    while seeds:
         # print(convTarget, " ---- ", maps["soil"])
+        # print(len(seeds))
+        # if (len(seeds) > 1000):
+        #    print(seeds)
+        #    break
+        (j,k) = seeds.pop()
+        interacted = False
         for convRange in maps[convTarget]:
-
-            s_pt = seedRange[0]
-            e_pt = seedRange[0] + seedRange[1] - 1
+            interacted = False
+            s_pt = j
+            e_pt = j + k
 
             conversion_destination_point = convRange[0]
             cv_s_pt = convRange[1]
-            cv_e_pt = convRange[1] + convRange[2] - 1
+            cv_e_pt = convRange[1] + convRange[2]
 
             if e_pt < cv_s_pt:
                 # below range
@@ -71,58 +79,55 @@ for convTarget in items:
                 # above range
                 continue
             if s_pt >= cv_s_pt and e_pt <= cv_e_pt:
-                offset = s_pt - cv_s_pt
-                seedRange[0] = conversion_destination_point + offset
-                continue
+                interacted = True
+                newSds.append((conversion_destination_point + s_pt - cv_s_pt, e_pt - s_pt))
+                break
             if s_pt < cv_s_pt and e_pt >= cv_s_pt and e_pt <= cv_e_pt:
                 # start below, run into
                 # cut:
                 new_s_pt = s_pt
                 new_e_pt = cv_s_pt - 1
-                seeds.append([new_s_pt, new_e_pt - new_s_pt + 1])
+                seeds.append((new_s_pt, new_e_pt - new_s_pt))
 
                 #reform:
                 s_pt = cv_s_pt
-                seedRange[0] = s_pt
-                seedRange[1] = e_pt - s_pt + 1
-                offset = s_pt - cv_s_pt
-                seedRange[0] = conversion_destination_point + offset
-                continue
+                seeds.append((s_pt, e_pt - s_pt))
+                interacted = True
+                break
             if s_pt >= cv_s_pt and s_pt <= cv_e_pt and e_pt > cv_e_pt:
                 # start within, run out
                 #cut:
                 new_s_pt = cv_e_pt + 1
                 new_e_pt = e_pt
-                seeds.append([new_s_pt, new_e_pt - new_s_pt + 1])
+                seeds.append((new_s_pt, new_e_pt - new_s_pt))
 
                 #reform:
                 e_pt = cv_e_pt
-                seedRange[0] = s_pt
-                seedRange[1] = e_pt - s_pt + 1
-                offset = s_pt - cv_s_pt
-                seedRange[0] = conversion_destination_point + offset
-                continue
+                seeds.append((s_pt, e_pt - s_pt))
+                interacted = True
+                break
             if s_pt < cv_s_pt and e_pt > cv_e_pt:
                 # start under, end over
                 #cut1:
                 new_s_pt = s_pt
                 new_e_pt = cv_s_pt - 1
-                seeds.append([new_s_pt, new_e_pt - new_s_pt + 1])
+                seeds.append((new_s_pt, new_e_pt - new_s_pt))
 
                 #cut2:
                 new_s_pt = cv_e_pt + 1
                 new_e_pt = e_pt
-                seeds.append([new_s_pt, new_e_pt - new_s_pt + 1])
+                seeds.append((new_s_pt, new_e_pt - new_s_pt))
 
                 #reform:
                 s_pt = cv_s_pt
                 e_pt = cv_e_pt
-                seedRange[0] = s_pt
-                seedRange[1] = e_pt - s_pt + 1
-                offset = s_pt - cv_s_pt
-                seedRange[0] = conversion_destination_point + offset
-                continue
-
+                seeds.append((s_pt, e_pt - s_pt))
+                interacted = True
+                break
+        if interacted == False:
+            newSds.append((j, k))
+    # print("reached end\n\n\n\n\n\n\n\n\n")
+    seeds = newSds
 
 
 
