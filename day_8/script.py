@@ -41,3 +41,24 @@ while current_loc != "ZZZ":
 
 print(num_steps)
 
+path_lengths = []
+for pt in pathing.keys():
+    # print(pt, pt[-1])
+    if pt[-1] == "A":
+        pt_length = 0
+        curr_pt = pt
+        while curr_pt[-1] != "Z":
+            dir = list(instructions)[pt_length % len(instructions)]
+            pt_length += 1
+            if dir == "L":
+                curr_pt = pathing[curr_pt][0]
+            if dir == "R":
+                curr_pt = pathing[curr_pt][1]
+        path_lengths.append(pt_length)
+
+print(path_lengths)
+import math
+olp = 1
+for ptl in path_lengths:
+      olp = math.lcm(olp, ptl)
+print(olp)
