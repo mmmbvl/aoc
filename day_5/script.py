@@ -52,73 +52,156 @@ for line in inp:
 
     maps[currMap].append([destn, sourc, rng_l])
 
-
 for convTarget in items:
     for seedRange in seeds:
         # print(convTarget, " ---- ", maps["soil"])
         for convRange in maps[convTarget]:
 
-            initial_point = seedRange[0]
-            initial_length = seedRange[1]
+            s_pt = seedRange[0]
+            e_pt = seedRange[0] + seedRange[1] - 1
 
             conversion_destination_point = convRange[0]
-            conversion_source_point = convRange[1]
-            conversion_length = convRange[2]
-            print("\n\nComparing these: ")
-            print("Initial at:                               ", initial_point, "----    ", initial_length)
-            print("against:     ", "dest:", conversion_destination_point, "----","src:  ",conversion_source_point,"----","rng:",conversion_length)
-            if initial_point < conversion_source_point and initial_point + initial_length < conversion_source_point + conversion_length:
-                print("below range - skip")
+            cv_s_pt = convRange[1]
+            cv_e_pt = convRange[1] + convRange[2] - 1
+
+            if e_pt < cv_s_pt:
+                # below range
                 continue
-            elif initial_point > conversion_source_point + conversion_length:
-                print("above range - skip")
+            if s_pt > cv_e_pt:
+                # above range
                 continue
-            elif initial_point >= conversion_source_point and initial_point + initial_length <= conversion_source_point + conversion_length:
-                print("within range")
-                conv_offset = initial_point - conversion_source_point
-                initial_point = conversion_destination_point + conv_offset
-            elif initial_point >= conversion_source_point and initial_point + initial_length > conversion_source_point + conversion_length:
-                # starts in conversion range, but extends beyond -- must split
-                print("start within, end out")
-                new_point = conversion_source_point + conversion_length + 1
-                new_length = initial_point + initial_length - new_point + 1
-                seeds.append([new_point, new_length])
+            if s_pt >= cv_s_pt and e_pt <= cv_e_pt:
+                offset = s_pt - cv_s_pt
+                seedRange[0] = conversion_destination_point + offset
+                continue
+            if s_pt < cv_s_pt and e_pt >= cv_s_pt and e_pt <= cv_e_pt:
+                # start below, run into
+                # cut:
+                new_s_pt = s_pt
+                new_e_pt = cv_s_pt - 1
+                seeds.append([new_s_pt, new_e_pt - new_s_pt + 1])
 
-                initial_length = conversion_source_point + conversion_length - initial_point + 1
+                #reform:
+                s_pt = cv_s_pt
+                seedRange[0] = s_pt
+                seedRange[1] = e_pt - s_pt + 1
+                offset = s_pt - cv_s_pt
+                seedRange[0] = conversion_destination_point + offset
+                continue
+            if s_pt >= cv_s_pt and s_pt <= cv_e_pt and e_pt > cv_e_pt:
+                # start within, run out
+                #cut:
+                new_s_pt = cv_e_pt + 1
+                new_e_pt = e_pt
+                seeds.append([new_s_pt, new_e_pt - new_s_pt + 1])
 
-                conv_offset = initial_point - conversion_source_point
-                initial_point = conversion_destination_point + conv_offset
-            elif initial_point < conversion_source_point and initial_point + initial_length <= conversion_source_point + conversion_length:
-                # starts before conversion range, but ends within
-                print("start out, end in")
-                new_point = initial_point
-                new_length = conversion_source_point - initial_point
-                seeds.append([new_point, new_length])
+                #reform:
+                e_pt = cv_e_pt
+                seedRange[0] = s_pt
+                seedRange[1] = e_pt - s_pt + 1
+                offset = s_pt - cv_s_pt
+                seedRange[0] = conversion_destination_point + offset
+                continue
+            if s_pt < cv_s_pt and e_pt > cv_e_pt:
+                # start under, end over
+                #cut1:
+                new_s_pt = s_pt
+                new_e_pt = cv_s_pt - 1
+                seeds.append([new_s_pt, new_e_pt - new_s_pt + 1])
 
-                initial_length = initial_point + initial_length - conversion_source_point + 1
-                initial_point = conversion_source_point
+                #cut2:
+                new_s_pt = cv_e_pt + 1
+                new_e_pt = e_pt
+                seeds.append([new_s_pt, new_e_pt - new_s_pt + 1])
 
-                conv_offset = initial_point - conversion_source_point
-                initial_point = conversion_destination_point + conv_offset
-            elif initial_point < conversion_source_point and initial_point + initial_length > conversion_source_point + conversion_length:
-                # starts before conversion range, ends after conversion range -- must split twice
-                print("run all through")
-                new_point = conversion_source_point + conversion_length + 1
-                new_length = initial_point + initial_length - new_point + 1
-                seeds.append([new_point, new_length])
+                #reform:
+                s_pt = cv_s_pt
+                e_pt = cv_e_pt
+                seedRange[0] = s_pt
+                seedRange[1] = e_pt - s_pt + 1
+                offset = s_pt - cv_s_pt
+                seedRange[0] = conversion_destination_point + offset
+                continue
 
-                new_point = initial_point
-                new_length = conversion_source_point - initial_point
-                seeds.append([new_point, new_length])
 
-                initial_point = conversion_destination_point
-                initial_length = conversion_length
+
+
+
+
+
+
+
+
+# for convTarget in items:
+#     for seedRange in seeds:
+#         # print(convTarget, " ---- ", maps["soil"])
+#         for convRange in maps[convTarget]:
+
+#             initial_point = seedRange[0]
+#             initial_length = seedRange[1]
+
+#             conversion_destination_point = convRange[0]
+#             conversion_source_point = convRange[1]
+#             conversion_length = convRange[2]
+#             print("\n\nComparing these: ")
+#             print("Initial at:                               ", initial_point, "----    ", initial_length)
+#             print("against:     ", "dest:", conversion_destination_point, "----","src:  ",conversion_source_point,"----","rng:",conversion_length)
+#             if initial_point < conversion_source_point and initial_point + initial_length < conversion_source_point + conversion_length:
+#                 print("below range - skip")
+#                 continue
+#             elif initial_point > conversion_source_point + conversion_length:
+#                 print("above range - skip")
+#                 continue
+#             elif initial_point >= conversion_source_point and initial_point + initial_length <= conversion_source_point + conversion_length:
+#                 print("within range")
+#                 conv_offset = initial_point - conversion_source_point
+#                 initial_point = conversion_destination_point + conv_offset
+#             elif initial_point >= conversion_source_point and initial_point + initial_length > conversion_source_point + conversion_length:
+#                 # starts in conversion range, but extends beyond -- must split
+#                 print("start within, end out")
+#                 new_point = conversion_source_point + conversion_length + 1
+#                 new_length = initial_point + initial_length - new_point + 1
+#                 seeds.append([new_point, new_length])
+#                 print("created new split:    ", new_point, "----", new_length)
+
+#                 initial_length = conversion_source_point + conversion_length - initial_point + 1
+
+#                 conv_offset = initial_point - conversion_source_point
+#                 initial_point = conversion_destination_point + conv_offset
+#             elif initial_point < conversion_source_point and initial_point + initial_length <= conversion_source_point + conversion_length:
+#                 # starts before conversion range, but ends within
+#                 print("start out, end in")
+#                 new_point = initial_point
+#                 new_length = conversion_source_point - initial_point
+#                 seeds.append([new_point, new_length])
+#                 print("created new split:    ", new_point, "----", new_length)
+
+#                 initial_length = initial_point + initial_length - conversion_source_point + 1
+#                 initial_point = conversion_source_point
+
+#                 conv_offset = initial_point - conversion_source_point
+#                 initial_point = conversion_destination_point + conv_offset
+#             elif initial_point < conversion_source_point and initial_point + initial_length > conversion_source_point + conversion_length:
+#                 # starts before conversion range, ends after conversion range -- must split twice
+#                 print("run all through")
+#                 new_point = conversion_source_point + conversion_length + 1
+#                 new_length = initial_point + initial_length - new_point + 1
+#                 seeds.append([new_point, new_length])
+#                 print("created new split:    ", new_point, "----", new_length)
+
+#                 new_point = initial_point
+#                 new_length = conversion_source_point - initial_point
+#                 seeds.append([new_point, new_length])
+#                 print("created new split:    ", new_point, "----", new_length)
+
+#                 initial_point = conversion_destination_point
+#                 initial_length = conversion_length
             
-            seedRange[0] = initial_point
-            seedRange[1] = initial_length
-            # print("Comparing these: ")
-            print("Result at:  ", initial_point, "----", initial_length)
-            # print("against:     ", "dest:", conversion_destination_point, "----","src:",conversion_source_point,"----","rng:",conversion_length)
+#             seedRange[0] = initial_point
+#             seedRange[1] = initial_length
+#             # print("Comparing these: ")
+#             print("Result at:  ", initial_point, "----", initial_length)
+#             # print("against:     ", "dest:", conversion_destination_point, "----","src:",conversion_source_point,"----","rng:",conversion_length)
 
 
 # find lowest
