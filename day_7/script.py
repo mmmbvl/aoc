@@ -70,6 +70,49 @@ def camelCardSort(hands):
     return s
 
 sorted_hands = camelCardSort(hands)
+# for i,g in enumerate(sorted_hands):
+#     print(g, "  ", int(g[1]),"  ", (len(sorted_hands) - i))
+
+value = 0
+for i,g in enumerate(sorted_hands):
+    value += int(g[1]) * (len(sorted_hands) - i)
+print(value)
+
+
+
+
+jokerCardRanks = ["A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J"]
+def convertJokerRank(card):
+    for i,x in enumerate(jokerCardRanks):
+        if (card == x):
+            return i
+    return -1
+
+for h in hands:
+    num_jokers = 0
+    for x in list(h[0]):
+        if x == "J":
+            num_jokers += 1
+    
+    if h[2] == 2 and num_jokers > 0:
+        h[2] = 1
+    if h[2] == 3 and num_jokers > 0:
+        h[2] = 1
+    if h[2] == 4 and num_jokers > 0:
+        h[2] = 2
+    if h[2] == 5 and num_jokers == 1:
+        h[2] = 3
+    if h[2] == 5 and num_jokers == 2:
+        h[2] = 2
+    if h[2] == 6 and num_jokers > 0:
+        h[2] = 4
+    if h[2] == 7 and num_jokers > 0:
+        h[2] = 6       
+
+    
+    h[3] = (list(map(convertJokerRank, h[0])))
+
+sorted_hands = camelCardSort(hands)
 for i,g in enumerate(sorted_hands):
     print(g, "  ", int(g[1]),"  ", (len(sorted_hands) - i))
 
