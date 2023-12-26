@@ -87,6 +87,7 @@ moveSet = [
 ]
 
 maxPathLength = 0
+pathNodes = []
 
 def traverse(modify, mpl):
     for stDir in moveSet:
@@ -102,6 +103,7 @@ def traverse(modify, mpl):
                 print("fr: ", curr, " == ", m[curr[0]][curr[1]], "@@@|||||||||@@@", "to: ", next, " == ", m[next[0]][next[1]])
             if (ans[2] == "valid"):
                 pathlength += 1
+                pathNodes.append(next)
                 if modify:
                     if (m[curr[0]][curr[1]] == "|"):
                         if next[0] > curr[0]:
@@ -113,6 +115,26 @@ def traverse(modify, mpl):
                             m[curr[0]][curr[1]] = "E"
                         else:
                             m[curr[0]][curr[1]] = "W"
+                    elif (m[curr[0]][curr[1]] == "J"):
+                        if next[0] < curr[0]:
+                            m[curr[0]][curr[1]] = "n"
+                        else:
+                            m[curr[0]][curr[1]] = "s"
+                    elif (m[curr[0]][curr[1]] == "7"):
+                        if next[0] < curr[0]:
+                            m[curr[0]][curr[1]] = "a"
+                        else:
+                            m[curr[0]][curr[1]] = "b"
+                    elif (m[curr[0]][curr[1]] == "L"):
+                        if next[0] < curr[0]:
+                            m[curr[0]][curr[1]] = "c"
+                        else:
+                            m[curr[0]][curr[1]] = "d"
+                    elif (m[curr[0]][curr[1]] == "F"):
+                        if next[0] < curr[0]:
+                            m[curr[0]][curr[1]] = "e"
+                        else:
+                            m[curr[0]][curr[1]] = "f"
                     else:
                         m[curr[0]][curr[1]] = "X"
                 curr = ans[0]
@@ -137,29 +159,55 @@ else:
 print("P1: ", farthestDist)
 
 
-maxPathLength = traverse(True, maxPathLength)
-print("\n\nModified State")
+isInside = False
+nses = set()
+areaCounter = 0
 for r in range(len(m)):
-    print("".join(m[r]))
+    for c in range(len(m[r])):
+        inPath = False
+        for pn in pathNodes:
+            if r == pn[0] and c == pn[1]:
+                inPath = True
+        if inPath:
+            if (m[r][c] in ["J", "|", "L"]):
+                isInside = not isInside
+            # else:
+            #     isInside = False
+        else:
+            if isInside:
+                areaCounter += 1
+                nses.add((r,c))
 
-def pollute(m, pt, ctmt):
-    newPts = [
-        [pt[0] + 1,pt[1]],
-        [pt[0] - 1,pt[1]],
-        [pt[0],pt[1] + 1],
-        [pt[0],pt[1] - 1]
-    ]
+print("P2 by toggle: ", areaCounter, "---", len(nses))
 
-    b = m[pt[0]][pt[1]]
-    if not (b == "H" or b == "N" or b == "E" or b == "W" or b == "X" or b == ctmt):
-        m[pt[0]][pt[1]] = ctmt
-        for n in newPts:
-            if not (n[0] < 0 or n[1] < 0 or n[0] >= len(m) or n[1] >= len(m[n[0]])):
-                b = m[n[0]][n[1]]
-                if not (b == "H" or b == "N" or b == "E" or b == "W" or b == "X" or b == ctmt):
-                    pollute(m, n, ctmt)
+# maxPathLength = traverse(True, maxPathLength)
+# print("\n\nModified State")
+# for r in range(len(m)):
+#     print("".join(m[r]))
+
+# def pollute(m, pt, ctmt):
+#     newPts = [
+#         [pt[0] + 1,pt[1]],
+#         [pt[0] - 1,pt[1]],
+#         [pt[0],pt[1] + 1],
+#         [pt[0],pt[1] - 1]
+#         # [pt[0] + 1,pt[1] + 1],
+#         # [pt[0] - 1,pt[1] - 1],
+#         # [pt[0] - 1,pt[1] + 1],
+#         # [pt[0] + 1,pt[1] - 1]
+#     ]
+
+#     b = m[pt[0]][pt[1]]
+#     if not (b == "H" or b == "N" or b == "E" or b == "W" or b == "X" or b == ctmt):
+#         m[pt[0]][pt[1]] = ctmt
+#         for n in newPts:
+#             if not (n[0] < 0 or n[1] < 0 or n[0] >= len(m) or n[1] >= len(m[n[0]])):
+#                 b = m[n[0]][n[1]]
+#                 if not (b == "H" or b == "N" or b == "E" or b == "W" or b == "X" or b == ctmt):
+#                     pollute(m, n, ctmt)
 
 
+# ttt = 0
 # for r in range(len(m)):
 #     for c in range(len(m[r])):
 #         testedLoc = [r, c]
@@ -167,40 +215,45 @@ def pollute(m, pt, ctmt):
 #         numNS_Walls = 0
 #         for cx in range(len(m[r])):
 #             if cx != c:
-#                 if m[r][cx] == "X":
+#                 if m[r][cx] in ["N", "c", "d", "a", "b"]:
 #                     numEW_Walls += 1
-#         for rx in range(len(m)):
-#             if rx != r:
-#                 if m[rx][c] == "X":
-#                     numNS_Walls += 1
-#         isWithin = (numEW_Walls % 2 == 1) and (numNS_Walls % 2 == 1)
+#         # for rx in range(len(m)):
+#         #     if rx != r:
+#         #         if m[rx][c] == "H" or m[rx][c] == "N":
+#         #             numNS_Walls += 1
+#         isWithin = (numEW_Walls % 2 == 1)# and (numNS_Walls % 2 == 1)
 #         if (isWithin) and m[r][c] != "X":
-#             m[r][c] = "I"
+#             ttt += 1
 
-# print("Pollute corner:")
-# pollute(m, [0,0], "*")
-# for r in range(len(m)):
-#     print("".join(m[r]))
+# print("Using wall counting method: ", ttt)
+
+
+# # print("Pollute corner:")
+# # pollute(m, [0,0], "*")
+# # for r in range(len(m)):
+# #     print("".join(m[r]))
                     
 
-for r in range(len(m)):
-    for c in range(len(m[r])):
-        if m[r][c] == "E":
-            pollute(m, [r - 1, c], "*")
-        if m[r][c] == "W":
-            pollute(m, [r + 1, c], "*")
-        if m[r][c] == "N":
-            pollute(m, [r, c - 1], "*")
-        if m[r][c] == "H":
-            pollute(m, [r, c + 1], "*")
+# # for r in range(len(m)):
+# #     for c in range(len(m[r])):
+# #         if m[r][c] == "E":
+# #             pollute(m, [r - 1, c], "*")
+# #         # if m[r][c] == "W":
+# #         #     pollute(m, [r + 1, c], "*")
+# #         # if m[r][c] == "N":
+# #         #     pollute(m, [r, c - 1], "*")
+# #         if m[r][c] == "H":
+# #             pollute(m, [r, c + 1], "*")
+# #         if m[r][c] == "n":
+# #             pollute(m, [r - 1, c - 1], "*")
 
-print("\n\nAssume loop c-clockwise: ")
-for r in range(len(m)):
-    print("".join(m[r]))
+# # print("\n\nAssume loop c-clockwise: ")
+# # for r in range(len(m)):
+# #     print("".join(m[r]))
 
-area_find = 0
-for r in range(len(m)):
-    for c in range(len(m[r])):
-        if m[r][c] == "*":
-            area_find += 1
-print("P2: ", area_find)
+# area_find = 0
+# for r in range(len(m)):
+#     for c in range(len(m[r])):
+#         if m[r][c] == "*":
+#             area_find += 1
+# print("P2: ", area_find)
