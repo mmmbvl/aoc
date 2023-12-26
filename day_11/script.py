@@ -8,7 +8,7 @@ def make_map(lines):
         g_map.append(list(filter(lambda x : x != "\n", list(l))))
     return g_map
 
-def expand_map(m):
+def expand_map(m, expansion_factor):
     emptyRows = []
     emptyCols = []
 
@@ -29,11 +29,13 @@ def expand_map(m):
             emptyCols.append(c)
 
     for er in reversed(emptyRows):
-        m.insert(er, list(m[er][:]))
+        for z in range(expansion_factor):
+            m.insert(er, list(m[er][:]))
     
     for r in range(len(m)):
         for ec in reversed(emptyCols):
-            m[r].insert(ec, ".")
+            for z in range(expansion_factor):
+                m[r].insert(ec, ".")
     m[0][0]="A"
     return m
 
@@ -54,7 +56,7 @@ def dist_btwn_galaxies(gs, i, j):
 
 g_map = make_map(inp)
 print("\n".join(["".join(x) for x in g_map]))
-e_map = expand_map(g_map)
+e_map = expand_map(g_map, 1)
 print("\n".join(["".join(x) for x in e_map]))
 galaxies = grab_galaxies(e_map)
 print(galaxies)
@@ -66,3 +68,21 @@ for (i, x) in enumerate(galaxies):
             total += dist_btwn_galaxies(galaxies, i, j)
 
 print("P1: ", total)
+
+
+
+
+g_map = make_map(inp)
+# print("\n".join(["".join(x) for x in g_map]))
+e_map = expand_map(g_map, 1000000 - 1)
+# print("\n".join(["".join(x) for x in e_map]))
+galaxies = grab_galaxies(e_map)
+print(galaxies)
+
+total = 0
+for (i, x) in enumerate(galaxies):
+    for (j,y) in enumerate(galaxies):
+        if (j > i):
+            total += dist_btwn_galaxies(galaxies, i, j)
+
+print("P2: ", total)
