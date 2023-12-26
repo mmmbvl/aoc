@@ -25,3 +25,11 @@ for line in inp:
     sum += nextVal(parsedLine)
 
 print("P1: ", sum)
+
+sum = 0
+for line in inp:
+    parsedLine = list(map(lambda x : int(x), line.split(" ")))
+    sum += nextVal(list(reversed(parsedLine)))
+
+
+print("P1: ", sum)
