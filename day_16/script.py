@@ -43,7 +43,7 @@ class Laser():
     def show(self):
         return "$Laser [R:" + str(self.row) + "  C:" + str(self.col) + "] D:" + self.dir + "$"
 
-def propagate_lasers(start_laser, lava_map):
+def propagate_lasers(start_laser, lava_map, energized_map):
     lasers = []
     lasers.append(start_laser)
     previous_lasers = [start_laser.show()]
@@ -54,8 +54,8 @@ def propagate_lasers(start_laser, lava_map):
         # for l in lasers:
         #     print(l.show())
         lasers[0].move()
-        display()
-        print(lasers[0].row, lasers[0].col, lasers[0].dir)
+        # display()
+        # print(lasers[0].row, lasers[0].col, lasers[0].dir)
         # print(previous_lasers, lasers[0].show())
  
         if not lasers[0].show() in previous_lasers:
@@ -66,7 +66,7 @@ def propagate_lasers(start_laser, lava_map):
             continue
 
         if lasers[0].row < 0 or lasers[0].row >= len(lava_map) or lasers[0].col < 0 or lasers[0].col >= len(lava_map[0]):
-            print("Removed a laser")
+            # print("Removed a laser")
             lasers.pop(0)
             continue
 
@@ -81,24 +81,50 @@ def propagate_lasers(start_laser, lava_map):
             if lasers[0].dir == "N" or lasers[0].dir == "S":
                 lasers[0].change_direction("E")
                 lasers.append(Laser(lasers[0].row, lasers[0].col, "W"))
-                print("Added a laser vert", interacting_square)
+                # print("Added a laser vert", interacting_square)
         else: # interacting_square == "|":
             if lasers[0].dir == "E" or lasers[0].dir == "W":
-                print("To ad...", interacting_square, lasers[0].row, lasers[0].col, lasers[0].dir)
+                # print("To ad...", interacting_square, lasers[0].row, lasers[0].col, lasers[0].dir)
                 lasers[0].change_direction("N")
                 lasers.append(Laser(lasers[0].row, lasers[0].col, "S"))
-                print("Added a laser horiz", interacting_square, lasers[0].row, lasers[0].col, lasers[0].dir)
-                print(len(lasers))
+                # print("Added a laser horiz", interacting_square, lasers[0].row, lasers[0].col, lasers[0].dir)
+                # print(len(lasers))
 
 def solve(part):
 
     if part == "P1":
+        energized_map = [list(map(lambda x: 0, row)) for row in lava_map]
         total = 0
-        propagate_lasers(Laser(0,-1,"E"), lava_map)
-        for r in energized_map:
-            for c in r:
-                if c != 0: total += 1
+        propagate_lasers(Laser(0,-1,"E"), lava_map, energized_map)
+        for rq in energized_map:
+            for cq in rq:
+                if cq != 0: total += 1
         print("P1: ", total)
 
+    if part == "P2":
+        maximum = 0
+        
+        possible_starts = []
+
+        for r in range(len(lava_map)):
+            possible_starts.append(Laser(r,-1,"E"))
+            possible_starts.append(Laser(r,len(lava_map[0]),"W"))
+        for c in range(len(lava_map[0])):
+            possible_starts.append(Laser(-1,c,"S"))
+            possible_starts.append(Laser(len(lava_map),c,"N"))
+
+        for iu, ls in enumerate(possible_starts):
+            energized_map = [list(map(lambda x: 0, row)) for row in lava_map]
+            total = 0
+            propagate_lasers(ls, lava_map, energized_map)
+            for rx in energized_map:
+                for cx in rx:
+                    if cx != 0: total += 1
+            # print("number ", iu + 1, " of ", len(possible_starts), ":", total, " with best-so-far: ", maximum)
+            if total > maximum: maximum = total
+        
+        print("P2: ", maximum)
+
 solve("P1")
+solve("P2")
                 
