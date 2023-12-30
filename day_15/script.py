@@ -50,8 +50,6 @@ class Box():
             focal_len = int(self.lenses[i].focal_length)
             fp += box_power * focal_len * (i + 1)
         return fp
-        
-
 
 def hashstr(s):
     current_value = 0
@@ -88,15 +86,7 @@ def solve(inp, part):
                 else: #new box
                     boxes[g["box_number"]] = Box()
                     boxes[g["box_number"]].addLens(new_lens)
-            
-            print("After ", str, ":")
-            for bx in boxes.keys():
-                boxes[bx].show(bx)
-
-
         for bx in boxes.keys():
-            print("box focusing power", bx, "==> ", boxes[bx].focusing_power(bx))
-            # print("num of lenses", boxes[bx].numLenses)
             total += boxes[bx].focusing_power(bx)
         print("P2: ", total)   
 
@@ -105,7 +95,6 @@ def decompose(term):
     if "\n" in lt:
         lt.remove("\n")
     term = "".join(lt)
-    print(lt, "-" in lt, "=" in lt, term.split("-")[0])
     if "-" in lt:
         lab = term.split("-")[0]
         return {
@@ -122,7 +111,5 @@ def decompose(term):
             "focal_length": term[-1]
         }
 
+solve(inp,"P1")
 solve(inp,"P2")
-# print(hashstr("qp"))
-
-# 519083 too high
