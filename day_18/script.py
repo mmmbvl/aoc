@@ -104,5 +104,54 @@ def solve(part):
         grd = flood(grd, [sz[0] - 20, sz[1] - 20], "#", inst)
         num_dug = count_dug(grd)
         print("P1: ", num_dug)
+    if  part == "P2":
+        inst = process_instructions(inp)
+        new_inst = make_new_instructions(inst)
 
 solve("P1")
+
+def make_new_instructions(inst):
+    # inst (dir, length, (#color))
+    new_inst = []
+    for x in inst:
+        color = x[2][2:-1]
+        new_dir = color[-1]
+        if (new_dir == "0"):
+            new_dir = "R"
+        if (new_dir == "1"):
+            new_dir = "D"
+        if (new_dir == "2"):
+            new_dir = "L"
+        if (new_dir == "3"):
+            new_dir = "U"
+        new_length = color[:-1]
+        new_inst.append((new_dir, new_length, ""))
+    return new_inst
+
+def internal_area_dig(instructions):
+    rightwise_area = []
+    curr_pos = [0, 0]
+    rightwise_area.append(["X", 0, 0, 0])
+    for inst in instructions:
+        move_ch = directions[inst[0]]
+        curr_pos[0] += move_ch[0] * inst[1]
+        curr_pos[1] += move_ch[1] * inst[1]
+        rightwise_area.append([inst[0], inst[1], curr_pos[0], curr_pos[1]])
+        if len(rightwise_area) > 2:
+            previous_scnd_dir = rightwise_area[-3][0]
+            previous_dir = rightwise_area[-2][0]
+            curr_dir = rightwise_area[-1][0]
+
+        addable = curr_dir == previous_dir
+        if addable:
+            current_area_n = rightwise_area.pop()
+            previous_area_n = rightwise_area.pop()
+            rightwise_area.append([curr_dir, current_area_n[1] + previous_area_n[1], curr_pos[0], curr_pos[1]])
+
+        subtractable = (curr_dir == "U" and previous_dir == "D") or (curr_dir == "D" and previous_dir == "U") or (curr_dir == "R" and previous_dir == "L") or (curr_dir == "L" and previous_dir == "R")
+        if subtractable:
+            current_area_n = rightwise_area.pop()
+            previous_area_n = rightwise_area.pop()
+            rightwise_area.append([curr_dir, current_area_n[1] + previous_area_n[1], curr_pos[0], curr_pos[1]])
+
+
