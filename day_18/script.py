@@ -118,11 +118,11 @@ def make_new_instructions(inst):
             new_dir = "L"
         if (new_dir == "3"):
             new_dir = "U"
-        new_length = color[:-1]
+        new_length = int(color[:-1],16)
 
         move_ch = directions[x[0]]
-        curr_pos[0] += move_ch[0] * x[1]
-        curr_pos[1] += move_ch[1] * x[1]
+        curr_pos[0] += move_ch[0] * new_length
+        curr_pos[1] += move_ch[1] * new_length
         print("Turning old inst: ", x, " into new instruction: ", (new_dir, new_length, curr_pos[0], curr_pos[1]))
         new_inst.append((new_dir, new_length, curr_pos[0], curr_pos[1]))
     return new_inst
@@ -134,26 +134,32 @@ def reduce_collinear_inst(in1, in2):
     dir1 = in1[0]
     dir2 = in2[0]
 
+    rtn = ""
+
     if dir1 == dir2:
         new_dir = dir1
         new_len = in1[1] + in2[1]
-        return ("success", (new_dir, new_len, in2[2], in2[3]))
-    
-    if dir2 == opposite_directions[dir1]:
+        rtn = ("success", (new_dir, new_len, in2[2], in2[3]))
+    elif dir2 == opposite_directions[dir1]:
         if in1[1] > in2[1]:
             new_dir = dir1
             new_len = in1[1] - in2[1]
-            return ("success", (new_dir, new_len, in2[2], in2[3]))
+            rtn = ("success", (new_dir, new_len, in2[2], in2[3]))
         if in2[1] > in1[1]:
             new_dir = dir2
             new_len = in2[1] - in1[1]
             return ("success", (new_dir, new_len, in2[2], in2[3]))
-        return ("cancelled out", "")
-    
-    return ("not collinear", "")
+        else:
+            rtn = ("cancelled out", "")
+    else:
+        rtn =("not collinear", "")
+
+    print("Processing collinear ", in1, in2, " ===> ", rtn)
+    return rtn
 
 def reduce_boxlike_inst(in1, in2, in3):
     # CW : positive; CCW: negative
+    rtn = ""
     if in3[0] == opposite_directions[in1[0]] and in2[0] != in1[0] and in2[0] != in3[0]:
         if in1[0] == "U" or in1[0] == "D":
             cwdir = 1
@@ -161,65 +167,86 @@ def reduce_boxlike_inst(in1, in2, in3):
                 cwdir *= -1
             if in2[0] == "L":
                 cwdir *= -1
-            midpoint = [in2[2],in1[3]]
-            if midpoint[3] == in3[3]:
-                return ("success-c", cwdir * in2[1] * in1[1], (in2[0], in2[1], in3[2], in3[3]))
+            midpoint = [in1[2],in2[3]]
+            if midpoint[1] == in3[3]:
+                rtn = ("success-c", cwdir * in2[1] * in1[1], (in2[0], in2[1], in3[2], in3[3]))
             else:
                 new_dir = ""
                 new_len = 0
-                if in1[1] > in2[1]:
+                if in1[1] > in3[1]:
                     new_dir = in1[0]
-                    new_len = in1[1] - in2[1]
-                if in2[1] > in1[1]:
-                    new_dir = in2[0]
-                    new_len = in2[1] - in1[1]
-                return ("success", cwdir * in2[1] * in1[1], (in2[0], in2[1], midpoint[2], midpoint[3]), (new_dir, new_len, in3[2], in3[3]))
+                    new_len = in1[1] - in3[1]
+                if in3[1] > in1[1]:
+                    new_dir = in3[0]
+                    new_len = in3[1] - in1[1]
+                rtn =  ("success", cwdir * in2[1] * in1[1], (in2[0], in2[1], midpoint[0], midpoint[1]), (new_dir, new_len, in3[2], in3[3]))
         if in1[0] == "R" or in1[0] == "L":
             cwdir = 1
             if in1[0] == "U":
                 cwdir *= -1
             if in2[0] == "L":
                 cwdir *= -1
-            midpoint = [in1[2],in2[3]]
-            if midpoint[2] == in3[2]:
-                return ("success-c", cwdir * in2[1] * in1[1], (in2[0], in2[1], in3[2], in3[3]))
+            midpoint = [in2[2],in1[3]]
+            if midpoint[0] == in3[2]:
+                rtn =  ("success-c", cwdir * in2[1] * in1[1], (in2[0], in2[1], in3[2], in3[3]))
             else:
                 new_dir = ""
                 new_len = 0
-                if in1[1] > in2[1]:
+                if in1[1] > in3[1]:
                     new_dir = in1[0]
-                    new_len = in1[1] - in2[1]
-                if in2[1] > in1[1]:
-                    new_dir = in2[0]
-                    new_len = in2[1] - in1[1]
-                return ("success", cwdir * in2[1] * in1[1], (in2[0], in2[1], midpoint[2], midpoint[3]), (new_dir, new_len, in3[2], in3[3]))
+                    new_len = in1[1] - in3[1]
+                if in3[1] > in1[1]:
+                    new_dir = in3[0]
+                    new_len = in3[1] - in1[1]
+                rtn =  ("success", cwdir * in2[1] * in1[1], (in2[0], in2[1], midpoint[0], midpoint[1]), (new_dir, new_len, in3[2], in3[3]))
     else:
-        return ("not boxlike", 0, "")
+        rtn =  ("not boxlike", 0, "")
+    
+    print("Processing boxlike: ", in1, in2, in3, " ====> ", rtn)
+    return rtn
     
 def reduce_instructions(instructions):
     area = 0
     while instructions:
-        if len(instructions) == 2:
+        os.system("clear")
+        print("Current instruction length: ", len(instructions))
+        time.sleep(0.1)
+        if len(instructions) <= 2:
             break
         for i in range(1, len(instructions)):
             p = reduce_collinear_inst(instructions[i - 1], instructions[i])
             if p[0] == "success":
-                instructions = instructions[:i-1] + p[1] + instructions[i+1:]
+                instructions = instructions[:i-1] + [p[1]] + instructions[i+1:]
                 break
             if p[0] == "cancelled out":
                 instructions = instructions[:i-1] + instructions[i+1:]
                 break
+        print("No collinears")
+        # time.sleep(0.12)
         for i in range(2, len(instructions)):
             p = reduce_boxlike_inst(instructions[i - 2], instructions[i-1], instructions[i])
             if p[0] == "success":
-                instructions = instructions[:i-2] + p[2] + p[3] + instructions[i+1:]
+                instructions = instructions[:i-2] + [p[2]] + [p[3]] + instructions[i+1:]
                 area += p[1]
                 break
             if p[0] == "success-c":
-                instructions = instructions[:i-2] + p[2] + instructions[i+1:]
+                instructions = instructions[:i-2] + [p[2]] + instructions[i+1:]
                 area += p[1]
                 break
+        print("No boxlikes")
+
+        instructions = instructions[1:] + [instructions[0]]
+        # time.sleep(0.12)
     return area
+
+def shoelace_formula(instructions):
+    area = 0
+    for i in range(len(instructions)):
+        y = instructions[i][3]
+        xprev = instructions[((i - 1) + len(instructions)) % len(instructions)][2]
+        xnext = instructions[((i + 1) + len(instructions)) % len(instructions)][2]
+        area += y * (xprev + xnext)
+    return area / 2
 
 
 
@@ -238,8 +265,11 @@ def solve(part):
     if  part == "P2":
         inst = process_instructions(inp)
         new_inst = make_new_instructions(inst)
-        answer = reduce_instructions(new_inst)
-        print("P2: ", answer)
+        answer = shoelace_formula(new_inst)
+        # answer = reduce_instructions(new_inst)
+        print("P2: ", f'{answer:.20f}')
 
 # solve("P1")
 solve("P2")
+
+# P2: 30170576447424 too low
