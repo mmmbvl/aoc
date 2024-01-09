@@ -249,6 +249,20 @@ def shoelace_formula(instructions):
     return area / 2
 
 
+def greens_formula(instructions):
+    x = 0
+    y = 0
+    area = 0
+    perimeter = 0
+    for i in range(len(instructions)):
+        move_ch = directions[instructions[i][0]] 
+        delta = [move_ch[0] * instructions[i][1], move_ch[1] * instructions[i][1]]
+        x, y = x + delta[0], y + delta[1]
+        area += y * delta[0]
+        perimeter += instructions[i][1]
+    return area + perimeter//2 + 1
+
+
 
 
 
@@ -265,7 +279,8 @@ def solve(part):
     if  part == "P2":
         inst = process_instructions(inp)
         new_inst = make_new_instructions(inst)
-        answer = shoelace_formula(new_inst)
+        answer = greens_formula(new_inst)
+        # answer = shoelace_formula(new_inst)
         # answer = reduce_instructions(new_inst)
         print("P2: ", f'{answer:.20f}')
 
@@ -273,3 +288,4 @@ def solve(part):
 solve("P2")
 
 # P2: 30170576447424 too low
+# P2: 42708339569950
